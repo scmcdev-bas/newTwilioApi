@@ -10,6 +10,8 @@ const cors = require("cors");
 const privateKey = fs.readFileSync("./private.key", "utf8");
 const bodyParser = require("body-parser");
 const certificate = fs.readFileSync("./server.crt", "utf8");
+const getCustomer = require("./src/getCustomer");
+const caseStamp = require("./src/caseStamp")
 const credentials = {
   key: privateKey,
   cert: certificate,
@@ -31,7 +33,11 @@ app.use(bodyParser.json());
 app.post("/linecallstamp", historyStamp.lineCallStamp);
 app.post("/callstamp", historyStamp.callStamp);
 app.post("/messengerstamp", historyStamp.messengerStamp);
-
+app.post("/getcustomer", getCustomer.getCustomer);
+app.post("/createcustomer", getCustomer.createCustomer);
+app.post("/createsession", caseStamp.createSession)
+app.post("/stampendchatsession", caseStamp.updateSession)
+app.post("/insertcontacthistory",caseStamp.selectAndInsertContactHistory)
 // const httpsServer = https.createServer(credentials, app);
 
 // httpsServer.listen(2083, () => {
