@@ -119,12 +119,12 @@ const createSession = async (req, res) => {
 };
 const updateSession = async (req, res) => {
   const data = req.body;
-    console.log('updateSession')
-    console.log(data)
+  console.log("updateSession");
+  console.log(data);
   try {
     const pool = await createPool();
-    console.log('data.END_TIME',data.END_TIME)
-    console.log('data.EMAIL_ADDR',data.EMAIL_ADDR)
+    console.log("data.END_TIME", data.END_TIME);
+    console.log("data.EMAIL_ADDR", data.EMAIL_ADDR);
 
     const updateQuery = `
         UPDATE [dbo].[CURRENT_SESSION]
@@ -198,16 +198,19 @@ const selectAndInsertContactHistory = async (req, res) => {
         cs.[END_TIME],
         cs.[COMPLETE_TIME],
         cs.[DESC],
-        u.[USERNAME]
+        u.[USERNAME],
+        u.[ID]
     FROM 
         [scmc-POC].[dbo].[CURRENT_SESSION] cs
     INNER JOIN 
         [scmc-POC].[dbo].[USERS] u ON cs.[EMAIL_ADDR] = u.[EMAIL_ADDR]
     WHERE cs.EMAIL_ADDR = @EMAIL_ADDR
 `;
+
     const selectValues = {
       EMAIL_ADDR: data.EMAIL_ADDR,
     };
+
     const selectResults = await pool
       .request()
       .input("EMAIL_ADDR", sql.VarChar, selectValues.EMAIL_ADDR)
@@ -216,6 +219,7 @@ const selectAndInsertContactHistory = async (req, res) => {
     if (selectResults.recordset.length === 1) {
       const row = selectResults.recordset[0];
       console.log(row);
+
       const contactHistoryInsertQuery = `
           INSERT INTO [dbo].[CONTACT_HISTORY]
           ([SESSION_ID]
@@ -228,7 +232,8 @@ const selectAndInsertContactHistory = async (req, res) => {
           ,[END_TIME]
           ,[COMPLETE_TIME]
           ,[REMARK]
-          ,[CONTACT_ID])
+          ,[CONTACT_ID],
+          [AGENT_ID])
           VALUES
           (@SESSION_ID
           ,@CHANNEL_TYPE
@@ -240,7 +245,8 @@ const selectAndInsertContactHistory = async (req, res) => {
           ,@END_TIME
           ,@COMPLETE_TIME
           ,@REMARK
-          ,@CONTACT_ID)
+          ,@CONTACT_ID
+          ,@ID)
         `;
 
       const insertValues = {
@@ -255,6 +261,7 @@ const selectAndInsertContactHistory = async (req, res) => {
         COMPLETE_TIME: data.COMPLETE_TIME,
         REMARK: row.REMARK,
         CONTACT_ID: row.SESSION_USER_ID,
+        ID: row.ID,
       };
 
       await pool
@@ -270,6 +277,7 @@ const selectAndInsertContactHistory = async (req, res) => {
         .input("COMPLETE_TIME", sql.DateTime2, insertValues.COMPLETE_TIME)
         .input("REMARK", sql.NVarChar, insertValues.REMARK)
         .input("CONTACT_ID", sql.Int, insertValues.CONTACT_ID)
+        .input("ID", sql.Int, insertValues.ID)
         .query(contactHistoryInsertQuery);
 
       res.status(200).json({
