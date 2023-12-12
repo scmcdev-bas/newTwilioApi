@@ -12,6 +12,7 @@ const bodyParser = require("body-parser");
 const certificate = fs.readFileSync("./server.crt", "utf8");
 const getCustomer = require("./src/getCustomer");
 const caseStamp = require("./src/caseStamp")
+const createContact = require('./src/createContact')
 const credentials = {
   key: privateKey,
   cert: certificate,
@@ -38,6 +39,8 @@ app.post("/createcustomer", getCustomer.createCustomer);
 app.post("/createsession", caseStamp.createSession)
 app.post("/stampendchatsession", caseStamp.updateSession)
 app.post("/insertcontacthistory",caseStamp.selectAndInsertContactHistory)
+app.post("/getcontact",createContact.getCustomer)
+
 // const httpsServer = https.createServer(credentials, app);
 
 // httpsServer.listen(2083, () => {
