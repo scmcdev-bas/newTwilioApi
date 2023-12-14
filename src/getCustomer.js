@@ -68,13 +68,12 @@ const getCustomer = async (req, res) => {
     if (selectResults.recordset.length > 0) {
       // Log the results
       console.log(selectResults.recordset[0].CUSTOMER_ID);
-
       // Send the results as a response
       res.status(200).json({ CUSTOMER_ID: selectResults.recordset[0].CUSTOMER_ID,CONTACT_ID: selectResults.recordset[0].CONTACT_ID  });
     } else {
       res
-        .status(404)
-        .json({ error: "No customer found for the given criteria." });
+        .status(200)
+        .json({result : 0, message: "No customer found for the given criteria." });
     }
   } catch (error) {
     console.error(error);
@@ -83,6 +82,7 @@ const getCustomer = async (req, res) => {
 };
 
 const createCustomer = async (req, res) => {
+  console.log('createCustomer')
   const data = req.body;
   console.log(data);
 
@@ -171,14 +171,18 @@ const createCustomer = async (req, res) => {
     const insertAccount = {
       CONTACT_ID: customerContactID.toString(),
       CUSTOMER_ID: customerID.toString(),
-      IS_PRIMARY: "N",
+      IS_PRIMARY: "Y",
       CREATED_BY: "Twilio",
       CREATED_AT: moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
       UPDATED_BY: "Twilio",
       UPDATED_AT: moment().format("YYYY-MM-DD HH:mm:ss.SSS"),
     };
     customerContactAccount = await insertCustomerContactAccount(pool, insertAccount);
-
+    console.log("test",
+      customerID,
+      customerContactID,
+      customerContactChannel,
+      customerContactAccount,)
     res.status(200).json({
       success: true,
       customerID,
