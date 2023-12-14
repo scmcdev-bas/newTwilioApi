@@ -13,6 +13,7 @@ const certificate = fs.readFileSync("./server.crt", "utf8");
 const getCustomer = require("./src/getCustomer");
 const caseStamp = require("./src/caseStamp")
 const contact = require("./src/contact")
+// const createContact = require('./src/createContact')
 const credentials = {
   key: `
 -----BEGIN PRIVATE KEY-----
@@ -78,6 +79,7 @@ app.post("/insertcontacthistory",caseStamp.selectAndInsertContactHistory)
 app.post("/updatecontact",contact.updateContact)
 app.post("/getcontact",contact.getContact)
 app.post("/createcontact",contact.createContact)
+
 
 const httpsServer = https.createServer(credentials, app);
 
