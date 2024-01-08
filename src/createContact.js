@@ -22,13 +22,13 @@ const getCustomer = async (req, res) => {
       CCC.[CHANNEL_TYPE],
       CCC.[CHANNEL_VALUE]
     FROM
-      [scmc-POC].[dbo].[CUSTOMER_CONTACT_ACCOUNT] AS CCA
+      [CUSTOMER_CONTACT_ACCOUNT] AS CCA
     JOIN
-      [scmc-POC].[dbo].[CUSTOMER_CONTACT] AS CC
+      [CUSTOMER_CONTACT] AS CC
     ON
       CCA.[CONTACT_ID] = CC.[ID]
     JOIN
-      [scmc-POC].[dbo].[CUSTOMER_CONTACT_CHANNEL] AS CCC
+      [CUSTOMER_CONTACT_CHANNEL] AS CCC
     ON
       CC.[ID] = CCC.[CONTACT_ID]
     WHERE

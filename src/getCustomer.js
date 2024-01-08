@@ -9,34 +9,35 @@ const getCustomer = async (req, res) => {
   let channel = "";
   let value = "";
 
-  if (data.channel === "line") {
-    const matchResult = data.value.match(/UID:([^ ]+)/);
-    value = matchResult ? matchResult[1].toString() : "";
-    channel = "3";
-  } else if (data.channel === "chat") {
-    const matchResult = data.value.match(/messenger:([^ ]+)/);
-    value = matchResult ? matchResult[1].toString() : "";
-    channel = "4";
-  } else if (data.channel === "voice") {
-    if (data.value.startsWith("02")) {
-      const formattedString = `${data.value.slice(0, 2)}-${data.value.slice(
-        2,
-        5
-      )}-${data.value.slice(5)}`;
-      value = formattedString;
-    } else {
-      const formattedString = `${data.value.slice(0, 3)}-${data.value.slice(
-        3,
-        6
-      )}-${data.value.slice(6)}`;
-      value = formattedString;
-    }
-    channel = "1";
-  }
-
-  console.log("value", value);
-
+  
   try {
+    if (data.channel === "line") {
+      const matchResult = data.value.match(/UID:([^ ]+)/);
+      value = matchResult ? matchResult[1].toString() : "";
+      channel = "3";
+    } else if (data.channel === "chat") {
+      const matchResult = data.value.match(/messenger:([^ ]+)/);
+      value = matchResult ? matchResult[1].toString() : "";
+      channel = "4";
+    } else if (data.channel === "voice") {
+      if (data.value.startsWith("02")) {
+        const formattedString = `${data.value.slice(0, 2)}-${data.value.slice(
+          2,
+          5
+        )}-${data.value.slice(5)}`;
+        value = formattedString;
+      } else {
+        const formattedString = `${data.value.slice(0, 3)}-${data.value.slice(
+          3,
+          6
+        )}-${data.value.slice(6)}`;
+        value = formattedString;
+      }
+      channel = "1";
+    }
+  
+    console.log("value", value);
+  
     const pool = await createPool();
     const selectQuery = `
       SELECT 
@@ -44,9 +45,9 @@ const getCustomer = async (req, res) => {
         cca.[CUSTOMER_ID],
         ccc.CONTACT_ID
       FROM 
-        [scmc-POC].[dbo].[CUSTOMER_CONTACT_CHANNEL] ccc
+        [CUSTOMER_CONTACT_CHANNEL] ccc
       INNER JOIN 
-        [scmc-POC].[dbo].[CUSTOMER_CONTACT_ACCOUNT] cca 
+        [CUSTOMER_CONTACT_ACCOUNT] cca 
       ON 
         ccc.[CONTACT_ID] = cca.[CONTACT_ID]
       WHERE 

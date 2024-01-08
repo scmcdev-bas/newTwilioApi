@@ -92,7 +92,7 @@ const createSession = async (req, res) => {
       USER_ID: USER_ID.toString() || null,
       USER_NAME: USER_NAME.toString() || null,
       CONTACT_ID: data.CONTACT_ID || null,
-      START_TIME: data.START_TIME || null,
+      START_TIME: data.START_TIME.toString() || null,
     };
 
     const insertResults = await pool
@@ -128,21 +128,19 @@ const updateSession = async (req, res) => {
 
     const updateQuery = `
         UPDATE [dbo].[CURRENT_SESSION]
-        SET [CONTACT_ID] = @CONTACT_ID,
-            [END_TIME] = @END_TIME
+        SET [END_TIME] = @END_TIME
         WHERE [EMAIL_ADDR] = @EMAIL_ADDR
       `;
 
     const updateValues = {
-      CONTACT_ID: data.CONTACT_ID,
-      END_TIME: data.END_TIME,
+      END_TIME: data.END_TIME.toString(),
       EMAIL_ADDR: data.EMAIL_ADDR,
     };
-
+    console.log('updateValues',updateValues)
     const updateResults = await pool
       .request()
       .input("CONTACT_ID", sql.Int, updateValues.CONTACT_ID)
-      .input("END_TIME", sql.DateTime2, updateValues.END_TIME)
+      .input("END_TIME", sql.VarChar, updateValues.END_TIME)
       .input("EMAIL_ADDR", sql.VarChar, updateValues.EMAIL_ADDR)
       .query(updateQuery);
 
@@ -201,9 +199,9 @@ const selectAndInsertContactHistory = async (req, res) => {
         u.[USERNAME],
         u.[ID]
     FROM 
-        [scmc-POC].[dbo].[CURRENT_SESSION] cs
+        [CURRENT_SESSION] cs
     INNER JOIN 
-        [scmc-POC].[dbo].[USERS] u ON cs.[EMAIL_ADDR] = u.[EMAIL_ADDR]
+        [USERS] u ON cs.[EMAIL_ADDR] = u.[EMAIL_ADDR]
     WHERE cs.EMAIL_ADDR = @EMAIL_ADDR
 `;
 
@@ -215,7 +213,7 @@ const selectAndInsertContactHistory = async (req, res) => {
       .request()
       .input("EMAIL_ADDR", sql.VarChar, selectValues.EMAIL_ADDR)
       .query(selectQuery);
-
+    
     if (selectResults.recordset.length === 1) {
       const row = selectResults.recordset[0];
       console.log(row);
@@ -260,22 +258,22 @@ const selectAndInsertContactHistory = async (req, res) => {
         END_TIME: data.COMPLETE_TIME,
         COMPLETE_TIME: data.COMPLETE_TIME,
         REMARK: row.REMARK,
-        CONTACT_ID: row.SESSION_USER_ID,
+        CONTACT_ID: data.CONTACT_ID,
         ID: row.ID,
       };
 
       await pool
         .request()
-        .input("SESSION_ID", sql.NVarChar, insertValues.SESSION_ID)
+        .input("SESSION_ID", sql.VarChar, insertValues.SESSION_ID)
         .input("CHANNEL_TYPE", sql.Int, insertValues.CHANNEL_TYPE)
-        .input("CHANNEL_VALUE", sql.NVarChar, insertValues.CHANNEL_VALUE)
-        .input("DESC", sql.NVarChar, insertValues.DESC)
-        .input("AGENT", sql.NVarChar, insertValues.AGENT)
-        .input("EMAIL_ADDR", sql.NVarChar, insertValues.EMAIL_ADDR)
+        .input("CHANNEL_VALUE", sql.VarChar, insertValues.CHANNEL_VALUE)
+        .input("DESC", sql.VarChar, insertValues.DESC)
+        .input("AGENT", sql.VarChar, insertValues.AGENT)
+        .input("EMAIL_ADDR", sql.VarChar, insertValues.EMAIL_ADDR)
         .input("START_TIME", sql.DateTime2, insertValues.START_TIME)
         .input("END_TIME", sql.DateTime2, insertValues.END_TIME)
         .input("COMPLETE_TIME", sql.DateTime2, insertValues.COMPLETE_TIME)
-        .input("REMARK", sql.NVarChar, insertValues.REMARK)
+        .input("REMARK", sql.VarChar, insertValues.REMARK)
         .input("CONTACT_ID", sql.Int, insertValues.CONTACT_ID)
         .input("ID", sql.Int, insertValues.ID)
         .query(contactHistoryInsertQuery);
